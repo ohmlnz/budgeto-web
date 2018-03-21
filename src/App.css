@@ -1,0 +1,75 @@
+html {
+  background-color: #3D9BE9;
+}
+
+form {
+  text-align: center;
+  margin-top: 2em;
+}
+
+form h1 {
+  color: white;
+}
+
+.input-expense {
+  color: white;
+  font-size: 1em;
+  border: none;
+  padding: 1em;
+  display: block;
+  margin: auto;
+  width: 23%;
+  text-align: center;
+  background-color: #ffffff45;
+  border-radius: 2px;
+}
+
+select {
+  color: white;
+  font-size: 1em;
+  border: none;
+  display: block;
+  margin: auto;
+  width: 25.5%;
+  text-align: center;
+  background-color: #ffffff45;
+  height: 35px;
+  margin-top: .5em;
+}
+
+.reset, .export {
+  color: white;
+  font-size: 1em;
+  border: none;
+  padding: .5em;
+  width: 10%;
+  text-align: center;
+  background-color: #ffffff45;
+  border-radius: 2px;
+  margin-top: 2em;
+}
+
+.export {
+  margin-left: 1em;
+}
+
+.reset:hover, .export:hover {
+  cursor: pointer;
+  background-color: #ffffffad;
+  color: #3D9BE9;
+}
+
+.display-expenses {
+  margin-top: 5%;
+}
+
+.wrapper-expenses {
+  width: 250px;
+  margin: auto;
+  text-align: left;
+}
+
+.chartjs-render-monitor {
+  //display: none !important;
+  margin: 2em 0;
+}
