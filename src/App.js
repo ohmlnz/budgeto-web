@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Pie } from 'react-chartjs-2';
 import './App.css';
 
-const local = 'http://localhost:4000';
+const local = 'https://budgeto-api.herokuapp.com';
 
 const months = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
 'October', 'November', 'December' ];
@@ -134,7 +134,7 @@ class App extends Component {
           <button className='export' onClick={this.toCSV}>Export .csv</button>
           <div className='display-expenses'>
             <h4>Your expenses for {months[new Date().getMonth()]}</h4>
-            <div className='wrapper-expenses'>
+            <div className='wrapper-expenses' style={{ 'text-align': this.state.data.length? 'left' : 'center' }}>
               {this.state.data.length? this.state.data.map((el, i) => (
                 <div key={i}>{el[0]} | {el[1]}: <b>${el[2]}</b></div>
               )) : <span>No expenses at the moment</span> }

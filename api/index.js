@@ -1,8 +1,9 @@
-const express = require('express')
+const express = require('express');
 var sqlite3 = require('sqlite3').verbose();
 var bodyParser = require('body-parser');
 var moment = require('moment');
 var db = new sqlite3.Database('db');
+var port = process.env.PORT || 4000;
 const app = express();
 
 app.use(bodyParser.json());
@@ -51,4 +52,4 @@ app.get('/kill', (req, res) => {
   db.run("DELETE from budget");
 })
 
-app.listen(4000, () => console.log('Example app listening on port 4000!'))
+app.listen(port);
