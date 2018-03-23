@@ -1,26 +1,37 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import Base64 from 'base-64';
 import { Pie } from 'react-chartjs-2';
+import Login from './components/Login';
+import { months } from './data/months.js';
+import { categories } from './data/categories.js';
 import './App.css';
 
+const API_LOGIN = process.env.REACT_APP_BUDGETO_API_LOGIN;
+const API_PASSWORD = process.env.REACT_APP_BUDGETO_API_PASSWORD;
 const local = 'https://budgeto-api.herokuapp.com';
 
-const months = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
-'October', 'November', 'December' ];
 
 class App extends Component {
   state = {
     input: '',
     select: 'Rent/Mortgage',
+    login: '',
+    password: '',
     data: [],
     expenses: [],
-    categories: []
+    categories: [],
+    display: false
   }
 
   componentDidMount = () => {
     var self = this;
 
-    axios.get(`${local}/db`)
+    const tok = `${API_LOGIN}:${API_PASSWORD}`;
+    const hash = Base64.encode(tok);
+    const Basic = 'Basic ' + hash;
+
+    axios.get(`${local}/db`, { headers : { 'Authorization' : Basic } })
     .then(function(res) {
       self.setState({
         data: res.data,
@@ -31,7 +42,6 @@ class App extends Component {
     .catch(function(err) {
       console.log(err);
     });
-
   }
 
   componentDidUpdate = (prevProps, prevState) => {
@@ -85,6 +95,17 @@ class App extends Component {
       window.location = '/';
   }
 
+  login = (e) => {
+    e.preventDefault();
+    const { login, password } = this.state;
+
+    if (login === API_LOGIN && password === API_PASSWORD) {
+      this.setState({
+        display: !this.state.display
+      })
+    }
+  }
+
   toCSV = (e) => {
     e.preventDefault();
 
@@ -109,71 +130,60 @@ class App extends Component {
   render() {
     return (
       <div>
-        <form onSubmit={this.submit}>
+        <Login handlerLogin={this.login} handlerChange={this.change} {...this.state} />
+        <form onSubmit={this.submit} style={{ 'display': this.state.display? 'block' : 'none' }}>
           <h1>Budgeto</h1>
           <input className='input-expense' type="text" onChange={this.change} name='input' value={this.state.input}/>
           <select onChange={this.change} name='select'>
-            <option value="Rent/Mortgage">Rent/Mortgage</option>
-            <option value="Groceries">Groceries</option>
-            <option value="Fast Food/Take out">Fast Food/Take out</option>
-            <option value="Internet">Internet</option>
-            <option value="Electricity & Gas">Electricity & Gas</option>
-            <option value="Cell Phone">Cell Phone</option>
-            <option value="Car">Car</option>
-            <option value="Gas">Gas</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Transportation">Transportation</option>
-            <option value="Home Improvement">Home Improvement</option>
-            <option value="Gym">Gym</option>
-            <option value="Parking">Parking</option>
-            <option value="Miscellaneous">Miscellaneous</option>
+            {categories.map((el, i) => (
+              <option value={el} key={i}>{el}</option>
+            ))}
           </select>
           <input style={{ display: 'none' }} type="submit" value="Submit" />
           <button className='reset' onClick={this.reset}>Reset!</button>
           <button className='export' onClick={this.toCSV}>Export .csv</button>
           <div className='display-expenses'>
             <h4>Your expenses for {months[new Date().getMonth()]}</h4>
-            <div className='wrapper-expenses' style={{ 'text-align': this.state.data.length? 'left' : 'center' }}>
+            <div className='wrapper-expenses' style={{ 'textAlign': this.state.data.length? 'left' : 'center' }}>
               {this.state.data.length? this.state.data.map((el, i) => (
                 <div key={i}>{el[0]} | {el[1]}: <b>${el[2]}</b></div>
               )) : <span>No expenses at the moment</span> }
             </div>
           </div>
+          <Pie
+            options={{
+                legend: {
+                    display: false
+                }
+            }}
+            data={{
+              labels: this.state.categories,
+            	datasets: [{
+            		data: this.state.expenses,
+            		backgroundColor: [
+                  '#FF5733',
+                  '#DF4C2D',
+                  '#BF4126',
+                  '#9F3620',
+                  '#802B1A',
+                  '#602113',
+                  '#40160D'
+            		],
+            		hoverBackgroundColor: [
+                  '#FF5733',
+                  '#DF4C2D',
+                  '#BF4126',
+                  '#9F3620',
+                  '#802B1A',
+                  '#602113',
+                  '#40160D'
+            		]
+            	}]
+            }}
+            width={5}
+          	height={1}
+          />
         </form>
-        <Pie
-          options={{
-              legend: {
-                  display: false
-              }
-          }}
-          data={{
-            labels: this.state.categories,
-          	datasets: [{
-          		data: this.state.expenses,
-          		backgroundColor: [
-                '#FF5733',
-                '#DF4C2D',
-                '#BF4126',
-                '#9F3620',
-                '#802B1A',
-                '#602113',
-                '#40160D'
-          		],
-          		hoverBackgroundColor: [
-                '#FF5733',
-                '#DF4C2D',
-                '#BF4126',
-                '#9F3620',
-                '#802B1A',
-                '#602113',
-                '#40160D'
-          		]
-          	}]
-          }}
-          width={5}
-        	height={1}
-        />
       </div>
     );
   }
