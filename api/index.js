@@ -4,7 +4,9 @@ var bodyParser = require('body-parser');
 var moment = require('moment');
 var db = new sqlite3.Database('db');
 var port = process.env.PORT || 4000;
-const basicAuth = require('express-basic-auth')
+const basicAuth = require('express-basic-auth');
+// const dotenv = require("dotenv");
+// const result = dotenv.config();
 const app = express();
 
 var allowCrossDomain = function(req, res, next) {
@@ -26,7 +28,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(basicAuth({
-   users: { 'admin': 'supersecret' },
+   users: { [process.env.LOGIN] : [process.env.PASSWORD] },
    challenge: true,
    unauthorizedResponse: getUnauthorizedResponse
 }))
@@ -60,6 +62,8 @@ app.post('/expenses', (req, res) => {
 })
 
 app.get('/db', (req, res) => {
+
+  console.log()
   const elems = [];
 
   db.each("SELECT * from budget", function items(err, row) {

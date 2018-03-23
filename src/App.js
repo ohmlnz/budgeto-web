@@ -10,7 +10,9 @@ import './App.css';
 const API_LOGIN = process.env.REACT_APP_BUDGETO_API_LOGIN;
 const API_PASSWORD = process.env.REACT_APP_BUDGETO_API_PASSWORD;
 const local = 'https://budgeto-api.herokuapp.com';
-
+const token = `${API_LOGIN}:${API_PASSWORD}`;
+const hash = Base64.encode(token);
+const Basic = 'Basic ' + hash;
 
 class App extends Component {
   state = {
@@ -21,15 +23,12 @@ class App extends Component {
     data: [],
     expenses: [],
     categories: [],
-    display: false
+    display: false,
+    message: ''
   }
 
   componentDidMount = () => {
     var self = this;
-
-    const tok = `${API_LOGIN}:${API_PASSWORD}`;
-    const hash = Base64.encode(tok);
-    const Basic = 'Basic ' + hash;
 
     axios.get(`${local}/db`, { headers : { 'Authorization' : Basic } })
     .then(function(res) {
@@ -69,7 +68,7 @@ class App extends Component {
     axios.post(`${local}/expenses`, {
         value: this.state.input,
         category: this.state.select
-    })
+    }, { headers : { 'Authorization' : Basic } })
     .then(function() {
       self.setState({
         input: '',
@@ -84,7 +83,7 @@ class App extends Component {
   reset = (e) => {
     e.preventDefault();
 
-    axios.get(`${local}/kill`)
+    axios.get(`${local}/kill`, { headers : { 'Authorization' : Basic } })
       .then(function() {
         console.log('it\'s all gone buddy');
       })
@@ -102,6 +101,12 @@ class App extends Component {
     if (login === API_LOGIN && password === API_PASSWORD) {
       this.setState({
         display: !this.state.display
+      })
+    } else {
+      this.setState({
+        message: 'Wrong password. Try again.',
+        login: '',
+        password: ''
       })
     }
   }

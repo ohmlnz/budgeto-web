@@ -1,0 +1,38 @@
+.login-form input {
+  display: flex;
+  color: white;
+  font-size: 1em;
+  border: none;
+  padding: 1em;
+  display: block;
+  margin: auto;
+  width: 23%;
+  text-align: center;
+  background-color: #ffffff45;
+  border-radius: 2px;
+  margin-top: .7em;
+  margin-bottom: .7em;
+}
+
+.login-form label {
+  color: white;
+  font-family: "Helvetica Neue";
+  font-size: 1.1em;
+}
+
+.login-form input[type=submit] {
+  margin-top: 1.5em;
+  width: 15%;
+}
+
+.login-form input[type=submit]:hover {
+  cursor: pointer;
+  background-color: #ffffffad;
+  color: #3D9BE9;
+}
+
+.error-message {
+  color: white;
+  display: block;
+  margin-top: 2em;
+}
