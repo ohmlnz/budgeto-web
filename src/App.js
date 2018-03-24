@@ -24,10 +24,15 @@ class App extends Component {
     expenses: [],
     categories: [],
     display: false,
-    message: ''
+    message: '',
+    requestSent: false
   }
 
   componentDidMount = () => {
+    this.fetchData();
+  }
+
+  fetchData = () => {
     var self = this;
 
     axios.get(`${local}/db`, { headers : { 'Authorization' : Basic } })
@@ -41,11 +46,6 @@ class App extends Component {
     .catch(function(err) {
       console.log(err);
     });
-  }
-
-  componentDidUpdate = (prevProps, prevState) => {
-    //console.log(prevState)
-    //console.log(this.state.expenses)
   }
 
   change = (e) => {
@@ -72,8 +72,10 @@ class App extends Component {
     .then(function() {
       self.setState({
         input: '',
-        select: 'Rent/Mortgage'
+        select: 'Rent/Mortgage',
+        requestSent: true
       })
+      self.fetchData();
     })
     .catch(function(err) {
       console.log(err);
@@ -81,7 +83,7 @@ class App extends Component {
   }
 
   reset = (e) => {
-    e.preventDefault();
+     e.preventDefault();
 
     axios.get(`${local}/kill`, { headers : { 'Authorization' : Basic } })
       .then(function() {
@@ -91,7 +93,7 @@ class App extends Component {
         console.log(err);
       })
 
-      window.location = '/';
+      this.fetchData();
   }
 
   login = (e) => {
@@ -127,7 +129,7 @@ class App extends Component {
     let spreadsheet = encodeURI(csvContent);
     let link = document.createElement("a");
     link.setAttribute("href", spreadsheet);
-    link.setAttribute("download", "my_data.csv");
+    link.setAttribute("download", `expenses_${months[new Date().getMonth()]}.csv`);
     document.body.appendChild(link);
     link.click();
   }
