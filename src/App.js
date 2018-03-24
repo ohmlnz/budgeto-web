@@ -10,6 +10,7 @@ import './App.css';
 const API_LOGIN = process.env.REACT_APP_BUDGETO_API_LOGIN;
 const API_PASSWORD = process.env.REACT_APP_BUDGETO_API_PASSWORD;
 const local = 'https://budgeto-api.herokuapp.com';
+//const local = 'http://localhost:4000';
 const token = `${API_LOGIN}:${API_PASSWORD}`;
 const hash = Base64.encode(token);
 const Basic = 'Basic ' + hash;
@@ -24,12 +25,23 @@ class App extends Component {
     expenses: [],
     categories: [],
     display: false,
-    message: '',
-    requestSent: false
+    message: ''
   }
 
   componentDidMount = () => {
     this.fetchData();
+  }
+
+  combineArrays = (arr) => {
+    for (var i = arr.length-1; 0 <= i; i--) {
+      if (i > 0) {
+        if (arr[i][1] === arr[i-1][1]) {
+          arr[i-1][2] += arr[i][2];
+          arr[i][2] = 0;
+        }
+      }
+    }
+    return arr.filter(el => el[2] > 0);
   }
 
   fetchData = () => {
@@ -38,7 +50,7 @@ class App extends Component {
     axios.get(`${local}/db`, { headers : { 'Authorization' : Basic } })
     .then(function(res) {
       self.setState({
-        data: res.data,
+        data: self.combineArrays(res.data.sort()),
         categories: res.data.map(el => el[1]),
         expenses: res.data.map(el => el[2])
       })
@@ -61,8 +73,8 @@ class App extends Component {
 
     e.preventDefault();
 
-    if (this.state.input.length === 0) {
-      return;
+    if (this.state.input.length === 0 || isNaN(this.state.input)) {
+      return this.setState({ message: 'Please enter a valid input.'});
     }
 
     axios.post(`${local}/expenses`, {
@@ -72,8 +84,7 @@ class App extends Component {
     .then(function() {
       self.setState({
         input: '',
-        select: 'Rent/Mortgage',
-        requestSent: true
+        message: ''
       })
       self.fetchData();
     })
@@ -102,7 +113,8 @@ class App extends Component {
 
     if (login === API_LOGIN && password === API_PASSWORD) {
       this.setState({
-        display: !this.state.display
+        display: !this.state.display,
+        message: ''
       })
     } else {
       this.setState({
@@ -129,7 +141,7 @@ class App extends Component {
     let spreadsheet = encodeURI(csvContent);
     let link = document.createElement("a");
     link.setAttribute("href", spreadsheet);
-    link.setAttribute("download", `expenses_${months[new Date().getMonth()]}.csv`);
+    link.setAttribute("download", `expenses_${months[new Date().getMonth()].toLowerCase()}.csv`);
     document.body.appendChild(link);
     link.click();
   }
@@ -140,21 +152,27 @@ class App extends Component {
         <Login handlerLogin={this.login} handlerChange={this.change} {...this.state} />
         <form onSubmit={this.submit} style={{ 'display': this.state.display? 'block' : 'none' }}>
           <h1>Budgeto</h1>
-          <input className='input-expense' type="text" onChange={this.change} name='input' value={this.state.input}/>
+          <input className='input-expense' type="text" onChange={this.change} name='input' placeholder="Enter value and press enter" value={this.state.input}/>
           <select onChange={this.change} name='select'>
             {categories.map((el, i) => (
               <option value={el} key={i}>{el}</option>
             ))}
           </select>
           <input style={{ display: 'none' }} type="submit" value="Submit" />
-          <button className='reset' onClick={this.reset}>Reset!</button>
-          <button className='export' onClick={this.toCSV}>Export .csv</button>
+          <button className='reset' onClick={this.reset}>Reset</button>
+          <button className='export' onClick={this.toCSV}>Export</button>
+          <span className='error-message'>{this.state.message}</span>
           <div className='display-expenses'>
             <h4>Your expenses for {months[new Date().getMonth()]}</h4>
-            <div className='wrapper-expenses' style={{ 'textAlign': this.state.data.length? 'left' : 'center' }}>
-              {this.state.data.length? this.state.data.map((el, i) => (
-                <div key={i}>{el[0]} | {el[1]}: <b>${el[2]}</b></div>
-              )) : <span>No expenses at the moment</span> }
+            <div className='wrapper-expenses'>
+              {this.state.data.length?
+                this.state.data.map((el, i) => (
+                 <tr key={i}>
+                   <td>{el[0]}</td>
+                   <td>{el[1]}</td>
+                   <td><b>${el[2]}</b></td>
+                 </tr>
+               )) : <span>No expenses at the moment</span>}
             </div>
           </div>
           <Pie

@@ -5,6 +5,7 @@ class Login extends Component {
   render() {
     return (
       <form className='login-form' onSubmit={this.props.handlerLogin} style={{ 'display': this.props.display? 'none' : 'block' }}>
+        <h1>Budgeto</h1>
         <label>Username</label><input name='login' value={this.props.login} type='text' onChange={this.props.handlerChange}/>
         <label>Password</label><input name='password' value={this.props.password} type='password' onChange={this.props.handlerChange}/>
         <input type='submit' value='Submit' />
