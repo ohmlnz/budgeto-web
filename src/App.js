@@ -24,12 +24,18 @@ class App extends Component {
     data: [],
     expenses: [],
     categories: [],
-    display: false,
+    displayExp: false,
+    displayLogin: false,
     message: ''
   }
 
   componentDidMount = () => {
     this.fetchData();
+    setTimeout(() => {
+      let loading = document.querySelector('.loading');
+      loading.style.display = 'none';
+      this.setState({ displayLogin: true })
+    }, 1900);
   }
 
   combineArrays = (arr) => {
@@ -113,7 +119,8 @@ class App extends Component {
 
     if (login === API_LOGIN && password === API_PASSWORD) {
       this.setState({
-        display: !this.state.display,
+        displayExp: true,
+        displayLogin: false,
         message: ''
       })
     } else {
@@ -149,8 +156,9 @@ class App extends Component {
   render() {
     return (
       <div>
+        <h1 className='loading'>Budgeto</h1>
         <Login handlerLogin={this.login} handlerChange={this.change} {...this.state} />
-        <form onSubmit={this.submit} style={{ 'display': this.state.display? 'block' : 'none' }}>
+        <form onSubmit={this.submit} style={{ 'display': this.state.displayExp? 'block' : 'none' }}>
           <h1>Budgeto</h1>
           <input className='input-expense' type="text" onChange={this.change} name='input' placeholder="Enter value and press enter" value={this.state.input}/>
           <select onChange={this.change} name='select'>

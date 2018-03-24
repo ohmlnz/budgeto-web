@@ -2,6 +2,35 @@ html {
   background-color: #3D9BE9;
 }
 
+.loading {
+  color: #fff;
+  font-size: 5em;
+  opacity: 1;
+  animation: slideDown 2s, fadeOut 2s ease-in-out;
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  transform: translate(-50%,-50%);
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes slideDown {
+	0% {
+		transform: translate(-50%, 0);
+	}
+	100% {
+		transform: translate(-50%, 100%);
+	}
+}
+
 form {
   text-align: center;
   margin-top: 2em;
