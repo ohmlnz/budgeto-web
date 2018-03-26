@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Base64 from 'base-64';
 import { Pie } from 'react-chartjs-2';
+import Lottie from 'react-lottie';
+import * as animationData from './data/loader.json'
 import Login from './components/Login';
 import { months } from './data/months.js';
 import { categories } from './data/categories.js';
@@ -26,6 +28,7 @@ class App extends Component {
     categories: [],
     displayExp: false,
     displayLogin: false,
+    isStopped: false,
     message: ''
   }
 
@@ -60,6 +63,10 @@ class App extends Component {
         categories: res.data.map(el => el[1]),
         expenses: res.data.map(el => el[2])
       })
+    }).then(function() {
+      if (!self.state.data.length) {
+        self.setState({ isStopped: true })
+      }
     })
     .catch(function(err) {
       console.log(err);
@@ -125,7 +132,7 @@ class App extends Component {
       })
     } else {
       this.setState({
-        message: 'Wrong password. Try again.',
+        message: 'Wrong combination. Try again.',
         login: '',
         password: ''
       })
@@ -154,6 +161,11 @@ class App extends Component {
   }
 
   render() {
+    const defaultOptions = {
+      loop: true,
+      autoplay: true,
+      animationData: animationData
+    };
     return (
       <div>
         <h1 className='loading'>Budgeto</h1>
@@ -175,12 +187,22 @@ class App extends Component {
             <div className='wrapper-expenses'>
               {this.state.data.length?
                 this.state.data.map((el, i) => (
-                 <tr key={i}>
-                   <td>{el[0]}</td>
-                   <td>{el[1]}</td>
-                   <td><b>${el[2]}</b></td>
-                 </tr>
-               )) : <span>No expenses at the moment</span>}
+                  <table key={i}>
+                    <tbody>
+                     <tr>
+                       <td>{el[0]}</td>
+                       <td>{el[1]}</td>
+                       <td><b>${el[2]}</b></td>
+                     </tr>
+                    </tbody>
+                  </table>
+               )) : <div>{!this.state.isStopped?
+                       <Lottie options={defaultOptions}
+                        height={150}
+                        width={150}
+                        isStopped={this.state.isStopped}
+                        /> : <span>No expenses at the moment</span>}
+                    </div>}
             </div>
           </div>
           <Pie
