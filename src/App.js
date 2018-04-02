@@ -11,8 +11,8 @@ import './App.css';
 
 const API_LOGIN = process.env.REACT_APP_BUDGETO_API_LOGIN;
 const API_PASSWORD = process.env.REACT_APP_BUDGETO_API_PASSWORD;
-const local = 'https://budgeto-api.herokuapp.com';
-//const local = 'http://localhost:4000';
+//const local = 'https://budgeto-api.herokuapp.com';
+const local = 'http://localhost:4000';
 const token = `${API_LOGIN}:${API_PASSWORD}`;
 const hash = Base64.encode(token);
 const Basic = 'Basic ' + hash;
@@ -70,6 +70,7 @@ class App extends Component {
     })
     .catch(function(err) {
       console.log(err);
+      self.setState({ isStopped: true })
     });
   }
 
@@ -192,7 +193,7 @@ class App extends Component {
                      <tr>
                        <td>{el[0]}</td>
                        <td>{el[1]}</td>
-                       <td><b>${el[2]}</b></td>
+                       <td><b>${el[2].toFixed(2)}</b></td>
                      </tr>
                     </tbody>
                   </table>

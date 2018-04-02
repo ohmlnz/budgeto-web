@@ -40,20 +40,22 @@ function getUnauthorizedResponse(req) {
 }
 
 db.serialize(function() {
-  db.run("CREATE TABLE budget (date TEXT, category TEXT, expenses REAL)", function(err) {});
+  db.run("CREATE TABLE budget (date TEXT, category TEXT, expenses REAL, month TEXT, budget_id INTEGER PRIMARY KEY)", function(err) {});
 });
 
 app.get('/', (req, res) => res.send('Hello world!'));
 
 app.post('/expenses', (req, res) => {
   db.serialize(function() {
-    var stmt = db.prepare("INSERT INTO budget VALUES (?, ?, ?)");
+    var stmt = db.prepare("INSERT INTO budget VALUES (?, ?, ?, ?, ?)");
     let category = req.body.category;
     let expense = parseFloat(req.body.value);
-    let date = moment().format('YYYY/MM/DD');
+    let date = moment().format('MM/DD/YY');
+    let month = moment().format('MMMM');
+    let budget_id = parseInt(Math.round(Date.now()+Math.random()).toString().slice(7));
 
     if (typeof(category) === 'string' && typeof(expense) === 'number' && !isNaN(expense)) {
-      stmt.run(date, category, expense);
+      stmt.run(date, category, expense, month, budget_id);
     }
 
     stmt.finalize();
@@ -62,11 +64,12 @@ app.post('/expenses', (req, res) => {
 })
 
 app.get('/db', (req, res) => {
-
-  console.log()
   const elems = [];
+  const month = moment().format('MMMM');
 
-  db.each("SELECT * from budget", function items(err, row) {
+  var stmt = db.prepare("SELECT * from budget WHERE month = ?");
+
+  stmt.each(month, function items(err, row) {
     elems.push([row.date, row.category, row.expenses])
   }, function complete(err, rows) {
     res.send(elems);
