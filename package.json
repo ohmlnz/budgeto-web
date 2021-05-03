@@ -6,7 +6,7 @@
     "axios": "^0.21.1",
     "chart.js": "^2.9.4",
     "react": "^16.14.0",
-    "react-chartjs-2": "^2.7.0",
+    "react-chartjs-2": "^2.11.2",
     "react-dom": "^16.2.1",
     "react-lottie": "^1.0.0"
   },
